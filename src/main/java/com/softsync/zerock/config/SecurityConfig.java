@@ -25,7 +25,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/potal").hasAnyRole("USER")
+                .requestMatchers("/potal").hasRole("USER")
                 .requestMatchers("/**").permitAll()
                 .anyRequest().authenticated()
             )
@@ -67,6 +67,7 @@ public class SecurityConfig {
                 response.sendRedirect("/potal"); // 모든 사용자가 로그인 후 보게 될 공통 홈페이지
             } catch (IOException e) {
                 logger.error("Failed to redirect after login", e);
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Login successful, but redirection failed.");
             }
         };
     };
@@ -82,7 +83,7 @@ public class SecurityConfig {
 
     private LogoutHandler customLogoutHandler() {
         return (request, response, authentication) -> {
-            if (authentication != null) {
+            if (authentication != null && authentication.getAuthorities() != null) {
                 authentication.getAuthorities().forEach(authority -> {
                     String cookieName = "";
                     switch (authority.getAuthority()) {
@@ -90,10 +91,12 @@ public class SecurityConfig {
                             cookieName = "userAccess";
                             break;                      
                     }
-                    Cookie cookie = new Cookie(cookieName, null);
-                    cookie.setMaxAge(0);
-                    cookie.setPath("/");
-                    response.addCookie(cookie);
+                    if (!cookieName.isEmpty()) {
+                        Cookie cookie = new Cookie(cookieName, null);
+                        cookie.setMaxAge(0);
+                        cookie.setPath("/");
+                        response.addCookie(cookie);
+                    }
                 });
                 try {
                     request.getSession().setAttribute("logoutMessage", "로그아웃 되었습니다.");

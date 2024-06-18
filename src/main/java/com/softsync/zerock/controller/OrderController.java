@@ -207,7 +207,7 @@ public class OrderController {
 	    if(order.getOrderYn().equals("Y")){
 	    	receivingService.saveReceiving(order);
 	    }
-	    return "redirect:/purchase_order";
+	    return "redirect:purchase_order";
 	}
 
 	@PostMapping("/pushOrders")
@@ -219,7 +219,7 @@ public class OrderController {
 		  
 		order.setReceiptYn("Y"); // '발주서발행' 버튼을 눌렀을 때 발주서 발행여부 'Y'로 설정
 		
-		  return "redirect:/purchase_order";
+		  return "redirect:purchase_order";
 	}
     
  

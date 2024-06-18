@@ -32,4 +32,6 @@ public class CategoryController {
         List<Category> subcategories = categoryRepository.findAllByParentId(parentId);
         return ResponseEntity.ok(subcategories);
     }
+    
+    
 }

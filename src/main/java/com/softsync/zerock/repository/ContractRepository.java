@@ -14,21 +14,24 @@ import com.softsync.zerock.entity.Item;
 
 public interface ContractRepository extends JpaRepository<Contract, Integer> {
 
-	Contract findByItemItemCode(String itemCode);
-	Contract findByItemId(Long itemId);
-	List<Contract> findAllByItemItemCode(String itemCode);
-	
-	Long countByContractYn(char contractYn);
+   Contract findByItemItemCode(String itemCode);
+   Contract findByItemId(Long itemId);
+   
+   List<Contract> findAllByItemItemCode(String itemCode);
+   
+   Long countByContractYn(char contractYn);
 
-	Contract findByItem(Item item);
+   Contract findByItem(Item item);
 
-	@Query("SELECT COUNT(*) FROM Contract  WHERE contract_date BETWEEN :startDate AND :endDate")
-	Long countByContractDate(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+   @Query("SELECT COUNT(*) FROM Contract  WHERE contract_date BETWEEN :startDate AND :endDate")
+   Long countByContractDate(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-	
-	    
-	    Page<Contract> findByItem_ItemNameContaining(String itemName, Pageable pageable);
-	    Page<Contract> findByItem_ItemCodeContaining(String itemCode, Pageable pageable);
-		Page<Contract> findByOrders_OrderNoContaining(String searchKeyword, Pageable pageable);
-	 
+   
+       
+       Page<Contract> findByItem_ItemNameContaining(String itemName, Pageable pageable);
+       Page<Contract> findByItem_ItemCodeContaining(String itemCode, Pageable pageable);
+      Page<Contract> findByOrders_OrderNoContaining(String searchKeyword, Pageable pageable);
+      
+       boolean existsByItem(Item item); 
+    
 }

@@ -74,7 +74,7 @@ public class ReceivingController {
 		System.out.println("입고 컨트롤러 : 자재입고" +quantity);
 		receivingService.updateReceiving(quantity, num);
 		
-		return "redirect:/receivings";
+		return "redirect:receivings";
 	}
 	
 	//입고 마감
@@ -84,7 +84,7 @@ public class ReceivingController {
 		
 		receivingService.endRecieving(num);
 
-      return "redirect:/receivings";
+      return "redirect:receivings";
    }
    
    

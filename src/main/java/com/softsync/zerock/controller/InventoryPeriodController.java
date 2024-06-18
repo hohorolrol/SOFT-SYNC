@@ -65,7 +65,7 @@ public class InventoryPeriodController {
            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-           @RequestParam(value = "size", required = false, defaultValue = "10") int size,
+           @RequestParam(value = "size", required = false, defaultValue = "5") int size,
            @RequestParam(value = "search", required = false, defaultValue = "") String search) {
 
        if (startDate == null) {
@@ -114,7 +114,7 @@ public class InventoryPeriodController {
    @ResponseBody
    public Map<String, Object> getDefaultInventoryPeriodReport(
            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-           @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+           @RequestParam(value = "size", required = false, defaultValue = "5") int size) {
 
        Pageable pageable = PageRequest.of(page, size);
        Page<InventoryPeriodSummaryDTO> inventoryPeriodsPage = inventoryPeriodService.getAllInventoryPeriodSummaries(pageable);
@@ -140,6 +140,48 @@ public class InventoryPeriodController {
        response.put("currentPage", inventoryPeriodsPage.getNumber());
        response.put("totalItems", inventoryPeriodsPage.getTotalElements());
        response.put("pageSize", inventoryPeriodsPage.getSize());
+
+       return response;
+   }
+   
+   @GetMapping("/inventory_period_report2")
+   @ResponseBody
+   public Map<String, Object> getInventoryPeriodReport(
+           @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+           @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,           
+           @RequestParam(value = "search", required = false, defaultValue = "") String search) {
+
+       if (startDate == null) {
+           startDate = LocalDate.now().withMonth(1).withDayOfMonth(1); // 기본값: 당해년도 1월 1일
+       }
+       if (endDate == null) {
+           endDate = LocalDate.now(); // 기본값: 오늘
+       }
+
+       List<InventoryPeriodSummaryDTO> inventoryPeriods = inventoryPeriodService.getInventoryPeriodSummaries(startDate, endDate);
+
+       // 검색어가 포함된 품목만 필터링
+       if (!search.isEmpty()) {
+           inventoryPeriods = inventoryPeriods.stream()
+                   .filter(ip -> ip.getInventoryName().toLowerCase().contains(search.toLowerCase()))
+                   .collect(Collectors.toList());
+       }
+
+//       // 상위 N개의 항목만 표시하도록 정렬 및 제한 (출고 기준)
+//       inventoryPeriods = inventoryPeriods.stream()
+//               .sorted((a, b) -> Long.compare(b.getTotalShipmentQuantity(), a.getTotalShipmentQuantity()))
+//               .limit(limit)
+//               .collect(Collectors.toList());
+
+       long finalInventory = inventoryPeriods.stream()
+             .mapToLong(InventoryPeriodSummaryDTO::getFinalInventory).sum();
+       double totalInventoryValue = inventoryPeriods.stream()
+               .mapToDouble(InventoryPeriodSummaryDTO::getFinalInventoryValue).sum();
+
+       Map<String, Object> response = new HashMap<>();
+       response.put("inventoryPeriods", inventoryPeriods);
+       response.put("finalInventory", finalInventory);
+       response.put("totalInventoryValue", totalInventoryValue);
 
        return response;
    }

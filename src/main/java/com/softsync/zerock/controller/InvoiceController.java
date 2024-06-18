@@ -71,6 +71,6 @@ System.out.println("컨트롤러 제이슨 오더노 : " + jsonNode);
 		
 		invoiceService.saveInvice(no);
 		
-		return "redirect:/invoice";
+		return "redirect:invoice";
 	}
 }

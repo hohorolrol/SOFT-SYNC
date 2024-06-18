@@ -38,6 +38,14 @@ public class InventoryPeriodService {
         return inventoryPeriodRepository.findAllInventoryPeriodSummaries(pageable);
     }
     
+    public List<InventoryPeriodSummaryDTO> getInventoryPeriodSummaries(LocalDate startDate, LocalDate endDate) {
+        return inventoryPeriodRepository.findInventoryPeriodSummaries(startDate, endDate);
+    }
+    
+    public List<InventoryPeriodSummaryDTO> getAllInventoryPeriodSummaries() {
+        return inventoryPeriodRepository.findAllInventoryPeriodSummaries();
+    }
+    
     public void delete(InventoryPeriod inventoryPeriod) {
         inventoryPeriodRepository.delete(inventoryPeriod);
     }
